@@ -1,17 +1,17 @@
 # Copyright 2011 Free Software Foundation, Inc.
-# 
+#
 # This file is part of GNU Radio
-# 
+#
 # GNU Radio is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 3, or (at your option)
 # any later version.
-# 
+#
 # GNU Radio is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with GNU Radio; see the file COPYING.  If not, write to
 # the Free Software Foundation, Inc., 51 Franklin Street,
@@ -56,7 +56,7 @@ set(Boost_ADDITIONAL_VERSIONS
     "1.60.0" "1.60" "1.61.0" "1.61" "1.62.0" "1.62" "1.63.0" "1.63" "1.64.0" "1.64"
     "1.65.0" "1.65" "1.66.0" "1.66" "1.67.0" "1.67" "1.68.0" "1.68" "1.69.0" "1.69"
 )
-find_package(Boost "1.35")
+find_package(Boost "1.35" COMPONENTS system)
 
 if(NOT Boost_FOUND)
     message(FATAL_ERROR "Boost required to compile ec")
@@ -82,12 +82,14 @@ set(GRC_BLOCKS_DIR      ${GR_PKG_DATA_DIR}/grc/blocks)
 ########################################################################
 # Find gnuradio build dependencies
 ########################################################################
-find_package(GnuradioRuntime)
-find_package(CppUnit)
+set(GR_REQUIRED_COMPONENTS RUNTIME )
+find_package(Gnuradio "3.7")
 
 if(NOT GNURADIO_RUNTIME_FOUND)
-    message(FATAL_ERROR "Gnuradio Runtime required to compile ec")
+    message(FATAL_ERROR "GnuRadio Runtime required to compile ec")
 endif()
+
+find_package(CppUnit)
 
 if(NOT CPPUNIT_FOUND)
     message(FATAL_ERROR "CppUnit required to compile ec")

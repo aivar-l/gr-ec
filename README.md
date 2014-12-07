@@ -1,4 +1,10 @@
-gr-ec
-=====
+#gr-ec
+This GNU Radio module is originally created by Martin Neerot from ESTCube-1 student satellite team.
+It can be used to decode G3RUH scrambled AX.25 packets.
 
-Update (to gnuradio 3.7) of https://www.cgran.org/wiki/ESTCube-1Receiver
+#install
+    mkdir build
+    cd build/
+    cmake ../
+    make
+    make install

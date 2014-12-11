@@ -35,59 +35,62 @@ using namespace std;
 //--------------- Private Methods ------------------------------------
 
 void
-ec_ax25_decoder_b::printer(unsigned short frame_size, unsigned char *frame_buf)
+ec_ax25_decoder_b::printer(unsigned short frame_size, unsigned char* frame_buf)
 {
   int adr_len;
-  unsigned int bit_shifted;
+  ax25_address_t source;
+  ax25_address_t destination;
+  uint8_t control;
+  uint8_t pid;
   int i;
 
-  if (frame_buf[13]&0x01) {
-    adr_len=14;
-  }
-  else if (frame_buf[20] & 0x01) {
-    adr_len=21;
-  }
-  else {
-    adr_len=28;
-  }
   time_t rawtime;
   struct tm * timeinfo;
-  time ( &rawtime );
-  timeinfo = localtime ( &rawtime );
-  printf ( "Current local time and date: %s", asctime (timeinfo) );
-  printf("Destination:  ");
-  for(i=0; i<frame_size-2; i++) {
-    bit_shifted= frame_buf[i]>>1;
-    if(i==13 & adr_len>14) {
-      printf("\nLayer 2 repeater subfield 1:  ");
-    }
-    else if(i==20 & adr_len>21) {
-      printf("\nLayer 2 repeater subfield 2:  ");
-    }
-    else if(i==6) {
-      printf("\nSource:  ");
-    }
-    else if(i==adr_len-1) {
-      printf("\nControl, PID and Info:\n");
-    }
-    else if(i<adr_len) {
-      if(bit_shifted<0x7F && bit_shifted>=0x20){
-        printf("%c", bit_shifted);
-      }
-      else{
-        printf(" %02X ", bit_shifted);
+  time(&rawtime);
+  timeinfo = localtime(&rawtime);
+
+  if (frame_buf[13] & 0x01) {
+    adr_len = 14;
+    printf("%s", asctime(timeinfo));
+
+    // shift every byte in address field right
+    // replace sapces " " in callsign with '\0' for prettier printing
+    for(i=0; i<adr_len; i++) {
+      frame_buf[i] = frame_buf[i] >> 1;
+      if (frame_buf[i] == ' ') {
+        frame_buf[i] = '\0';
       }
     }
-    else {
-      if(frame_buf[i]<0x7F && frame_buf[i]>=0x20) {
-        printf("%c", frame_buf[i]);
-      }
-      else {
-        printf(" %02X ", frame_buf[i]);
+
+    // fill in callsigns
+    memcpy((uint8_t*)(&destination), &frame_buf[0], AX25_CALLSIGN_LENGTH);
+    ((uint8_t*)(&destination))[AX25_CALLSIGN_LENGTH] = '\0';
+    destination.ssid = frame_buf[6] & 0x0F;
+
+    memcpy((uint8_t*)(&source), &frame_buf[AX25_CALLSIGN_LENGTH + 1], AX25_CALLSIGN_LENGTH);
+    ((uint8_t*)(&source))[AX25_CALLSIGN_LENGTH] = '\0';
+    source.ssid = frame_buf[13] & 0x0F;
+
+    control = frame_buf[14];
+    pid = frame_buf[15];
+
+    printf("from %s-%d to %s-%d control=%02X pid=%02X\n", source.callsign, source.ssid, destination.callsign, destination.ssid, control, pid);
+
+    // info field
+    for(i=adr_len + 2; i<frame_size-2; i++) {
+      printf("%02X", frame_buf[i]);
+
+      // group 4 bytes together
+      if ((i - adr_len - 1) % 4 == 0) {
+        printf(" ");
       }
     }
+
+    printf("\n\n");
   }
-  printf("\n\n");
+  else {
+    printf("error: printing layer 2 repeater subfields is not yet implemented\n");
+  }
 }
 
 void

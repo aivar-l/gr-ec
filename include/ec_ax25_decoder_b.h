@@ -23,9 +23,18 @@
 
 #include <ec_api.h>
 #include <gnuradio/sync_block.h>
-//#include <ppio.h>
 #include <gnuradio/msg_queue.h>
 #include <gnuradio/blocks/file_sink_base.h>
+
+
+#define AX25_CALLSIGN_LENGTH 6
+typedef struct
+{
+  char callsign[AX25_CALLSIGN_LENGTH + 1]; // +1 is for '\0'
+  uint8_t ssid;
+
+} ax25_address_t;
+
 
 class ec_ax25_decoder_b;
 typedef boost::shared_ptr<ec_ax25_decoder_b> ec_ax25_decoder_b_sptr;
@@ -69,7 +78,7 @@ private:
 
   // Private Methods ----------
 
-  void printer(unsigned short frame_size, unsigned char *frame_buf);
+  void printer(unsigned short frame_size, unsigned char* frame_buf);
   void file_output_1(unsigned short frame_size, unsigned char *frame_buf, const char *filename);
   void file_output_2(unsigned short frame_size, unsigned char *frame_buf, const char *filename);
 

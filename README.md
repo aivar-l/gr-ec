@@ -12,7 +12,7 @@ It can be used to decode G3RUH scrambled AX.25 packets.
 #mac os x install
 follow gnuradio installation instructions here https://github.com/andresv/homebrew-gnuradio
 
-gnuradio uses homebrew pyhton however cmake is unable to find correct python version therefore it is given here as argument
+gnuradio uses homebrew pyhton however cmake is unable to find correct python therefore correct path is given as an argument
 
     mkdir build
     cd build/
